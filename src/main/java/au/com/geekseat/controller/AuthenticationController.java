@@ -11,7 +11,6 @@ import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
-import static au.com.geekseat.service.PersonService.fromDecorator;
 import static javax.ws.rs.core.MediaType.*;
 
 @Path("/auth")
@@ -42,7 +41,7 @@ public class AuthenticationController {
                         return Response.status(Response.Status.UNAUTHORIZED);
                     }
                     try {
-                        return Response.ok(JWTUtils.generate(fromDecorator.decorate(person)));
+                        return Response.ok(JWTUtils.generate(person));
                     } catch (Exception e) {
                         Log.error("Error loggin in: {}");
                         return Response.status(Response.Status.BAD_REQUEST);

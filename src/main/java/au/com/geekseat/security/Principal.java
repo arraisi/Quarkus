@@ -14,7 +14,7 @@ public class Principal {
     private String name;
     private String email;
     private Gender gender;
-    private Map<String, Object> map = new HashMap<>();
+    private Object map;
     private Set<String> roles;
     private List<String> states;
     private boolean administrator;
@@ -22,7 +22,7 @@ public class Principal {
 
     public static final Principal System = new Principal(null, null, null, null, null, null, null, false);
 
-    public Principal(Long id, String name, String email, Map<String, Object> map, Gender gender, Set<String> roles, List<String> states, boolean administrator) {
+    public Principal(Long id, String name, String email, Object map, Gender gender, Set<String> roles, List<String> states, boolean administrator) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -33,7 +33,7 @@ public class Principal {
         this.administrator = administrator;
     }
 
-    public Principal(Long id, String firstName, String lastName, String email, Map<String, Object> map, Gender gender, Set<String> roles, List<String> states, boolean administrator) {
+    public Principal(Long id, String firstName, String lastName, String email, Object map, Gender gender, Set<String> roles, List<String> states, boolean administrator) {
         this.id = id;
         this.name = Utility.strip(Utility.stringify(firstName) + " " + Utility.stringify(lastName));
         this.email = email;
@@ -80,7 +80,7 @@ public class Principal {
         this.gender = gender;
     }
 
-    public Map<String, Object> getMap() {
+    public Object getMap() {
         return map;
     }
 

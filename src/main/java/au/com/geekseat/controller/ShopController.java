@@ -3,7 +3,6 @@ package au.com.geekseat.controller;
 import au.com.geekseat.model.Person;
 import au.com.geekseat.model.Shop;
 import au.com.geekseat.service.PocketService;
-import au.com.geekseat.service.ProductService;
 import au.com.geekseat.service.ShopService;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.panache.common.Sort;
@@ -18,7 +17,6 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
 
-import static au.com.geekseat.service.ShopService.toDecorator;
 import static io.quarkus.hibernate.reactive.panache.Panache.withTransaction;
 import static javax.ws.rs.core.Response.*;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
@@ -30,8 +28,6 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 public class ShopController {
     @Inject
     ShopService shopService;
-    @Inject
-    ProductService productService;
     @Inject
     PocketService pocketService;
 
@@ -46,8 +42,8 @@ public class ShopController {
     public Uni<Response> checkout(Person person) {
         return withTransaction(() -> Uni.combine().all()
                 .unis(
-                        shopService.checkout(person),
-                        pocketService.updatePocket(person)
+                        pocketService.updatePocket(person),
+                        shopService.checkout(person)
                 ).asTuple())
                 .map(objects -> ok(objects).build())
                 .onFailure()
@@ -57,7 +53,7 @@ public class ShopController {
     @POST
     public Uni<Response> save(Shop shop) {
         shop.createdBy();
-        return Panache.withTransaction(() -> shopService.persist(toDecorator.decorate(shop)))
+        return Panache.withTransaction(() -> shopService.persist(shop))
                 .map(response -> created(URI.create("/person" + response.getId())).build());
     }
 

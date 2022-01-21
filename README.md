@@ -7,10 +7,10 @@ If you want to learn more about Quarkus, please visit its website: https://quark
 ## Setup Database
     ```
     docker run -d --name \
-    quarkus-db \
+    gs-quarkus-db \
     -e MYSQL_DATABASE=quarkus \
     -e MYSQL_ROOT_PASSWORD=root \
-    -v "$PWD/mariadb-data:/var/lib/mysql" \
+    -v "$PWD/.database:/var/lib/mysql" \
     -p 127.0.0.1:3306:3306 \
     mariadb:10
     ```

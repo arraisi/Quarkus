@@ -1,5 +1,6 @@
 package au.com.geekseat.model;
 
+import au.com.geekseat.helper.MapConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import au.com.geekseat.helper.Utility;
 
@@ -33,14 +34,18 @@ public class BaseModel {
     @Column(name = "updated")
     private LocalDateTime updated;
 
-    @JsonIgnore
-    @Column(name = "map_data")
-    protected String mapData;
-    @Transient
-    protected Map<String, Object> map = new HashMap<>();
+//    @JsonIgnore
+//    @Column(name = "map_data")
+//    protected String mapData;
+
+//    @Transient
+    @Convert(converter = MapConverter.class)
+    private Object map = new HashMap<>();
+
     @Transient
     @JsonIgnore
     protected String transitMapData;
+
     @Transient
     protected Map<String, Object> transitMap = new HashMap<>();
 
@@ -96,19 +101,19 @@ public class BaseModel {
         this.updated = updated;
     }
 
-    public String getMapData() {
-        return mapData;
-    }
+//    public String getMapData() {
+//        return mapData;
+//    }
+//
+//    public void setMapData(String mapData) {
+//        this.mapData = mapData;
+//    }
 
-    public void setMapData(String mapData) {
-        this.mapData = mapData;
-    }
-
-    public Map<String, Object> getMap() {
+    public Object getMap() {
         return map;
     }
 
-    public void setMap(Map<String, Object> map) {
+    public void setMap(Object map) {
         this.map = map;
     }
 

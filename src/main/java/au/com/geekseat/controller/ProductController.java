@@ -16,7 +16,6 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
 
-import static au.com.geekseat.service.ProductService.*;
 import static io.quarkus.panache.common.Sort.Direction.Ascending;
 import static io.quarkus.panache.common.Sort.Direction.Descending;
 import static javax.ws.rs.core.Response.*;
@@ -40,8 +39,7 @@ public class ProductController {
             @QueryParam("pageSize") Integer pageSize) {
         return Panache.withTransaction(() -> Uni.combine().all()
                 .unis(productService.findAll(Sort.by(sortBy, sortDesc ? Descending : Ascending)).page(pageIndex, pageSize).list()
-                                .onItem().transformToMulti(persons -> Multi.createFrom().iterable(persons))
-                                .map(fromDecorator::decorate).collect().asList(),
+                                .onItem().transformToMulti(persons -> Multi.createFrom().iterable(persons)).collect().asList(),
                         productService.count())
                 .asTuple()
                 .map(objects -> ok(objects).build()));
@@ -50,7 +48,7 @@ public class ProductController {
     @POST
     public Uni<Response> save(Product product) {
         product.createdBy();
-        return Panache.withTransaction(() -> productService.persist(toDecorator.decorate(product)))
+        return Panache.withTransaction(() -> productService.persist(product))
                 .map(person -> created(URI.create("/person" + person.getId())).build());
     }
 

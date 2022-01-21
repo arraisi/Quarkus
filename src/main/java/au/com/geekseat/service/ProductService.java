@@ -1,6 +1,5 @@
 package au.com.geekseat.service;
 
-import au.com.geekseat.helper.Decorator;
 import au.com.geekseat.model.Product;
 import au.com.geekseat.model.Shop;
 import io.quarkus.hibernate.reactive.panache.Panache;
@@ -12,29 +11,10 @@ import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.List;
 
-import static au.com.geekseat.service.BaseService.fromDecorate;
-import static au.com.geekseat.service.BaseService.toDecorate;
 import static javax.ws.rs.core.Response.ok;
 
 @ApplicationScoped
 public class ProductService implements PanacheRepository<Product> {
-    public static final Decorator<Product> toDecorator = new Decorator<Product>() {
-        public Product decorate(Product entity) {
-            if (entity != null) {
-                toDecorate(entity);
-            }
-            return entity;
-        }
-    };
-
-    public static final Decorator<Product> fromDecorator = new Decorator<Product>() {
-        public Product decorate(Product entity) {
-            if (entity != null) {
-                fromDecorate(entity);
-            }
-            return entity;
-        }
-    };
 
     public Uni<List<Product>> checkoutProduct() {
         return findAll().list()
@@ -57,7 +37,7 @@ public class ProductService implements PanacheRepository<Product> {
             if (product.getQuantity() < shop.getQuantity()) {
                 throw new RuntimeException(product.getName() + " is out of stock");
             }
-            product.setQuantity(product.getQuantity() - 1);
+            product.setQuantity(product.getQuantity() - shop.getQuantity());
             return product;
         });
     }
@@ -70,11 +50,9 @@ public class ProductService implements PanacheRepository<Product> {
                 .map(integer -> ok(integer).build());
     }
 
-    private HashMap<String, Object> params(Product product) {
-        Product entity = toDecorator.decorate(product);
+    private HashMap<String, Object> params(Product entity) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", entity.getId());
-        params.put("mapData", entity.getMapData());
         params.put("name", entity.getName());
         params.put("price", entity.getPrice());
         params.put("quantity", entity.getQuantity());
