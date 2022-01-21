@@ -24,10 +24,10 @@ quarkus:
     info-description : Theta Quarkus Service Application Demo
   hibernate-orm:
     database:
-      generation: drop-and-create
-#      generation: none
+#      generation: drop-and-create
+      generation: none
 flyway:
-  enable: false
+  enable: true
 
 mp:
   jwt:

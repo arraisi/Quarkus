@@ -1,8 +1,8 @@
 package au.com.geekseat.service;
 
-import au.com.geekseat.model.Person;
 import au.com.geekseat.model.Product;
 import au.com.geekseat.model.Shop;
+import au.com.geekseat.security.Principal;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.PanacheRepository;
 import io.smallrye.mutiny.Uni;
@@ -18,7 +18,7 @@ public class ShopService implements PanacheRepository<Shop> {
     @Inject
     ProductService productService;
 
-    public Uni<List<Shop>> checkout(Person person) {
+    public Uni<List<Shop>> checkout(Principal person) {
         return find("person_id", person.getId()).list()
                 .chain(shops -> {
                     List<Uni<Product>> productList = new ArrayList<>();

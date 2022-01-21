@@ -3,12 +3,12 @@ package au.com.geekseat.security;
 import au.com.geekseat.helper.Utility;
 import au.com.geekseat.model.Gender;
 
-import java.util.HashMap;
+import javax.ws.rs.core.SecurityContext;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class Principal {
+public class Principal implements java.security.Principal {
 
     private Long id;
     private String name;
@@ -42,6 +42,21 @@ public class Principal {
         this.roles = roles;
         this.states = states;
         this.administrator = administrator;
+    }
+
+    public Principal() {
+    }
+
+    public Principal(SecurityContext context) {
+        Principal userPrincipal = (Principal) context.getUserPrincipal();
+        this.id = userPrincipal.getId();
+        this.name = userPrincipal.getName();
+        this.email = userPrincipal.getEmail();
+        this.gender = userPrincipal.getGender();
+        this.map = userPrincipal.getMap();
+        this.roles = userPrincipal.getRoles();
+        this.states = userPrincipal.getStates();
+        this.administrator = userPrincipal.isAdministrator();
     }
 
     public Principal essence() {

@@ -2,7 +2,7 @@ package au.com.geekseat.config;
 
 import io.quarkus.runtime.StartupEvent;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-//import org.flywaydb.core.Flyway;
+import org.flywaydb.core.Flyway;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -23,13 +23,13 @@ public class FlywayMigration {
     boolean isEnabled;
 
     public void runFlywayMigration(@Observes StartupEvent event) {
-        if(isEnabled){
-//            Flyway flyway =
-//                    Flyway.configure()
-//                            .dataSource("jdbc:" + datasourceUrl,
-//                                    datasourceUsername,
-//                                    datasourcePassword).load();
-//            flyway.migrate();
+        if (isEnabled) {
+            Flyway flyway =
+                    Flyway.configure()
+                            .dataSource("jdbc:" + datasourceUrl,
+                                    datasourceUsername,
+                                    datasourcePassword).load();
+            flyway.migrate();
         }
     }
 }

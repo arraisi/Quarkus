@@ -1,9 +1,11 @@
 package au.com.geekseat.helper;
 
+import au.com.geekseat.security.Principal;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import javax.ws.rs.core.SecurityContext;
 import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -100,5 +102,9 @@ public class Utility {
             return str;
         }
         return str.strip();
+    }
+
+    public static Principal getPrincipal(SecurityContext context) {
+        return new Principal(context);
     }
 }

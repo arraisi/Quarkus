@@ -1,6 +1,6 @@
 package au.com.geekseat.controller;
 
-import au.com.geekseat.model.Person;
+import au.com.geekseat.helper.Utility;
 import au.com.geekseat.model.Shop;
 import au.com.geekseat.service.PocketService;
 import au.com.geekseat.service.ShopService;
@@ -11,11 +11,15 @@ import io.smallrye.mutiny.Uni;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static io.quarkus.hibernate.reactive.panache.Panache.withTransaction;
 import static javax.ws.rs.core.Response.*;
@@ -39,12 +43,18 @@ public class ShopController {
 
     @PUT
     @Path("/checkout")
-    public Uni<Response> checkout(Person person) {
+    public Uni<Response> checkout(@Context SecurityContext context) {
         return withTransaction(() -> Uni.combine().all()
                 .unis(
-                        pocketService.updatePocket(person),
-                        shopService.checkout(person)
+                        pocketService.updatePocket(Utility.getPrincipal(context)),
+                        shopService.checkout(Utility.getPrincipal(context))
                 ).asTuple())
+                .map(objects -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("pocket", objects.getItem1());
+                    map.put("shop", objects.getItem2());
+                    return map;
+                })
                 .map(objects -> ok(objects).build())
                 .onFailure()
                 .recoverWithItem((e) -> serverError().entity(e.getMessage()).build());
