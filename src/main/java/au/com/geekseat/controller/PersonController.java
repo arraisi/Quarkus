@@ -1,5 +1,6 @@
 package au.com.geekseat.controller;
 
+import au.com.geekseat.helper.Utility;
 import au.com.geekseat.model.Person;
 import au.com.geekseat.service.PersonService;
 import io.quarkus.hibernate.reactive.panache.Panache;
@@ -11,8 +12,10 @@ import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.net.URI;
 import java.util.List;
 
@@ -33,31 +36,31 @@ public class PersonController {
     PersonService personService;
 
     @POST
-    public Uni<Response> save(Person person) {
-        person.createdBy();
+    public Uni<Response> save(Person person, @Context SecurityContext ctx) {
+        person.createdBy(Utility.getPrincipal(ctx));
         return Panache.withTransaction(() -> personService.persist(person))
                 .map(created -> created(URI.create("/person" + created.getId())).build());
     }
 
     @PUT
-    public Uni<Response> update(Person person) {
+    public Uni<Response> update(Person person, @Context SecurityContext ctx) {
         if (person.getId() == null) {
             return Uni.createFrom().item(status(BAD_REQUEST))
                     .map(ResponseBuilder::build);
         }
-        person.updatedBy();
+        person.updatedBy(Utility.getPrincipal(ctx));
         return Panache.withTransaction(() -> personService.update(person))
                 .map(updated -> ok(updated).build());
     }
 
     @PUT
     @Path("map")
-    public Uni<Response> updateMap(Person person) {
+    public Uni<Response> updateMap(Person person, @Context SecurityContext ctx) {
         if (person.getId() == null) {
             return Uni.createFrom().item(status(BAD_REQUEST))
                     .map(ResponseBuilder::build);
         }
-        return personService.updateMap(person)
+        return personService.updateMap(person, Utility.getPrincipal(ctx))
                 .map(updated -> ok(updated).build());
     }
 

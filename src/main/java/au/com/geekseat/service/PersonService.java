@@ -1,6 +1,7 @@
 package au.com.geekseat.service;
 
 import au.com.geekseat.model.Person;
+import au.com.geekseat.security.Principal;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.PanacheRepository;
 import io.smallrye.mutiny.Multi;
@@ -83,8 +84,8 @@ public class PersonService implements PanacheRepository<Person> {
         return person;
     }
 
-    public Uni<Integer> updateMap(Person person) {
-        person.updatedBy();
+    public Uni<Integer> updateMap(Person person, Principal principal) {
+        person.updatedBy(principal);
         return Panache.withTransaction(() -> update("map = ?1 where id = ?2", person.getMap(), person.getId()));
     }
 }

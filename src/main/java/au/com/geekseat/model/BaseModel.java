@@ -1,14 +1,13 @@
 package au.com.geekseat.model;
 
 import au.com.geekseat.helper.MapConverter;
+import au.com.geekseat.security.Principal;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import au.com.geekseat.helper.Utility;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @MappedSuperclass
 public class BaseModel {
@@ -34,31 +33,20 @@ public class BaseModel {
     @Column(name = "updated")
     private LocalDateTime updated;
 
-//    @JsonIgnore
-//    @Column(name = "map_data")
-//    protected String mapData;
-
-//    @Transient
     @Convert(converter = MapConverter.class)
-    private Object map = new HashMap<>();
+    private Object map;
 
-    @Transient
-    @JsonIgnore
-    protected String transitMapData;
+    @Convert(converter = MapConverter.class)
+    protected Object transitMap;
 
-    @Transient
-    protected Map<String, Object> transitMap = new HashMap<>();
-
-    public void createdBy() {
-        created = Utility.now();
-//        setCreatorId(principal.getId());
-//        setCreator(Utility.gson.toJson(principal.essence()));
+    public void createdBy(Principal principal) {
+        this.created = Utility.now();
+        this.createdBy = principal.getName();
     }
 
-    public void updatedBy() {
+    public void updatedBy(Principal principal) {
         this.updated = Utility.now();
-//        setEditorId(principal.getId());
-//        setEditor(Utility.gson.toJson(principal.essence()));
+        this.updatedBy = principal.getName();
     }
 
     public Long getId() {
@@ -101,14 +89,6 @@ public class BaseModel {
         this.updated = updated;
     }
 
-//    public String getMapData() {
-//        return mapData;
-//    }
-//
-//    public void setMapData(String mapData) {
-//        this.mapData = mapData;
-//    }
-
     public Object getMap() {
         return map;
     }
@@ -117,19 +97,11 @@ public class BaseModel {
         this.map = map;
     }
 
-    public String getTransitMapData() {
-        return transitMapData;
-    }
-
-    public void setTransitMapData(String transitMapData) {
-        this.transitMapData = transitMapData;
-    }
-
-    public Map<String, Object> getTransitMap() {
+    public Object getTransitMap() {
         return transitMap;
     }
 
-    public void setTransitMap(Map<String, Object> transitMap) {
+    public void setTransitMap(Object transitMap) {
         this.transitMap = transitMap;
     }
 }

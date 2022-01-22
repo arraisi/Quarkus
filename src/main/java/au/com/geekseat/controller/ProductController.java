@@ -1,5 +1,6 @@
 package au.com.geekseat.controller;
 
+import au.com.geekseat.helper.Utility;
 import au.com.geekseat.model.Product;
 import au.com.geekseat.service.ProductService;
 import io.quarkus.hibernate.reactive.panache.Panache;
@@ -10,8 +11,10 @@ import io.smallrye.mutiny.Uni;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import java.net.URI;
 import java.util.List;
@@ -46,19 +49,21 @@ public class ProductController {
     }
 
     @POST
-    public Uni<Response> save(Product product) {
-        product.createdBy();
+    public Uni<Response> save(Product product, @Context SecurityContext ctx) {
+        product.createdBy(Utility.getPrincipal(ctx));
         return Panache.withTransaction(() -> productService.persist(product))
                 .map(person -> created(URI.create("/person" + person.getId())).build());
     }
 
     @PUT
-    public Uni<Response> update(Product product) {
-        if (product.getId() == null) {
+    public Uni<Response> update(Product request) {
+        if (request.getId() == null) {
             return Uni.createFrom().item(status(BAD_REQUEST))
                     .map(Response.ResponseBuilder::build);
         }
-        return productService.update(product);
+        return Panache.withTransaction(() -> productService.findById(request.getId())
+                .map(response -> response.updateMapper(request))
+                .map(object -> ok(object).build()));
     }
 
     @DELETE

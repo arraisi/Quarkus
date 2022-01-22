@@ -61,21 +61,22 @@ public class ShopController {
     }
 
     @POST
-    public Uni<Response> save(Shop shop) {
-        shop.createdBy();
+    public Uni<Response> save(Shop shop, @Context SecurityContext ctx) {
+        shop.createdBy(Utility.getPrincipal(ctx));
         return Panache.withTransaction(() -> shopService.persist(shop))
                 .map(response -> created(URI.create("/person" + response.getId())).build());
     }
 
     @PUT
     @Path("/qty")
-    public Uni<Response> updateQty(Shop shop) {
+    public Uni<Response> updateQty(Shop shop, @Context SecurityContext ctx) {
         if (shop.getId() == null) {
             return Uni.createFrom().item(status(BAD_REQUEST))
-                    .map(Response.ResponseBuilder::build);
+                    .map(ResponseBuilder::build);
         }
-        return shopService.updateQty(shop)
-                .map(integer -> ok(integer).build());
+        return Panache.withTransaction(() -> shopService.findById(shop.getId())
+                .map(response -> response.updateMapper(shop, Utility.getPrincipal(ctx)))
+                .map(integer -> ok(integer).build()));
     }
 
     @DELETE

@@ -19,6 +19,16 @@ public class Product extends BaseModel {
     public Product() {
     }
 
+    public Product updateMapper(Product request) {
+        setPrice(request.getPrice());
+        setName(request.getName());
+        setQuantity(request.getQuantity());
+        setMap(request.getMap());
+        setUpdatedBy(request.getUpdatedBy());
+        setUpdated(request.getUpdated());
+        return this;
+    }
+
     public String getName() {
         return name;
     }

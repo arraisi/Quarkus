@@ -2,9 +2,11 @@ package au.com.geekseat.service;
 
 import au.com.geekseat.model.Product;
 import au.com.geekseat.model.Shop;
+import au.com.geekseat.security.Principal;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.PanacheRepository;
 import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.unchecked.Unchecked;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.core.Response;
@@ -32,20 +34,22 @@ public class ProductService implements PanacheRepository<Product> {
 
 
     public Uni<Product> checkout(Shop shop) {
-        Uni<Product> productUni = findById(shop.getId());
-        return productUni.map(product -> {
-            if (product.getQuantity() < shop.getQuantity()) {
-                throw new RuntimeException(product.getName() + " is out of stock");
-            }
-            product.setQuantity(product.getQuantity() - shop.getQuantity());
-            return product;
-        });
+        return findById(shop.getId()).map(
+                Unchecked.function(product -> {
+                            if (product.getQuantity() < shop.getQuantity()) {
+                                throw new RuntimeException(product.getName() + " is out of stock");
+                            }
+                            product.setQuantity(product.getQuantity() - shop.getQuantity());
+                            return product;
+                        }
+                )
+        );
     }
 
-    public Uni<Response> update(Product product) {
-        String query = "name = :name, mapData = :mapData, price = :price, quantity = :quantity, created = :created, createdBy = :createdBy, updated = :updated, updatedBy = :updatedBy " +
+    public Uni<Response> update(Product product, Principal principal) {
+        String query = "name = :name, map = :map, price = :price, quantity = :quantity, created = :created, createdBy = :createdBy, updated = :updated, updatedBy = :updatedBy " +
                 "where id = :id";
-        product.updatedBy();
+        product.updatedBy(principal);
         return Panache.withTransaction(() -> update(query, params(product)))
                 .map(integer -> ok(integer).build());
     }

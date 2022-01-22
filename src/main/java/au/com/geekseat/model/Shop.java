@@ -1,5 +1,7 @@
 package au.com.geekseat.model;
 
+import au.com.geekseat.security.Principal;
+
 import javax.persistence.*;
 
 @Entity
@@ -56,5 +58,16 @@ public class Shop extends BaseModel {
 
     public void setPerson(Person person) {
         this.person = person;
+    }
+
+    public Shop updateMapper(Shop request, Principal principal) {
+        this.updatedBy(principal);
+        setPerson(request.getPerson());
+        setProduct(request.getProduct());
+        setActive(request.getActive());
+        setQuantity(request.getQuantity());
+        setMap(request.getMap());
+        setTransitMap(request.getTransitMap());
+        return this;
     }
 }

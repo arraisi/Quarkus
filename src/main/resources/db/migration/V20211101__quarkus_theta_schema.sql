@@ -1,22 +1,25 @@
-create table hibernate_sequence
-(
-    next_val bigint null
-);
-
 create table fruit
 (
-    id   bigint      not null primary key,
+    id   bigint      not null
+        primary key,
     name varchar(40) null,
     constraint fruit_name_uindex
         unique (name)
 );
 
+create table hibernate_sequence
+(
+    next_val bigint null
+);
+
 create table person
 (
-    id         bigint       not null primary key,
+    id         bigint       not null
+        primary key,
     created    datetime(6)  null,
     created_by varchar(255) null,
     map        varchar(255) null,
+    transitMap varchar(255) null,
     updated    datetime(6)  null,
     updated_by varchar(255) null,
     active     bit          null,
@@ -29,7 +32,8 @@ create table person
 
 create table pocket
 (
-    id        bigint         not null primary key,
+    id        bigint         not null
+        primary key,
     balance   decimal(19, 2) null,
     name      varchar(255)   null,
     person_id bigint         not null,
@@ -39,10 +43,12 @@ create table pocket
 
 create table product
 (
-    id         bigint         not null primary key,
+    id         bigint         not null
+        primary key,
     created    datetime(6)    null,
     created_by varchar(255)   null,
     map        varchar(255)   null,
+    transitMap varchar(255)   null,
     updated    datetime(6)    null,
     updated_by varchar(255)   null,
     name       varchar(255)   null,
@@ -52,7 +58,8 @@ create table product
 
 create table role
 (
-    id   bigint       not null primary key,
+    id   bigint       not null
+        primary key,
     name varchar(255) null
 );
 
@@ -68,10 +75,12 @@ create table person_role
 
 create table shop
 (
-    id         bigint       not null primary key,
+    id         bigint       not null
+        primary key,
     created    datetime(6)  null,
     created_by varchar(255) null,
     map        varchar(255) null,
+    transitMap varchar(255) null,
     updated    datetime(6)  null,
     updated_by varchar(255) null,
     active     bit          null,
