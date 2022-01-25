@@ -10,9 +10,7 @@ import io.smallrye.mutiny.Uni;
 
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -32,18 +30,22 @@ import static javax.ws.rs.core.Response.*;
 @Consumes(MediaType.APPLICATION_JSON)
 public class PersonController {
 
-    @Inject
     PersonService personService;
+    SecurityContext ctx;
+
+    PersonController(PersonService personService, SecurityContext securityContext) {
+        this.personService = personService;
+        this.ctx = securityContext;
+    }
 
     @POST
-    public Uni<Response> save(Person person, @Context SecurityContext ctx) {
-        person.createdBy(Utility.getPrincipal(ctx));
-        return Panache.withTransaction(() -> personService.persist(person))
+    public Uni<Response> save(Person person) {
+        return Panache.withTransaction(() -> personService.save(person, Utility.getPrincipal(ctx)))
                 .map(created -> created(URI.create("/person" + created.getId())).build());
     }
 
     @PUT
-    public Uni<Response> update(Person person, @Context SecurityContext ctx) {
+    public Uni<Response> update(Person person) {
         if (person.getId() == null) {
             return Uni.createFrom().item(status(BAD_REQUEST))
                     .map(ResponseBuilder::build);
@@ -55,7 +57,7 @@ public class PersonController {
 
     @PUT
     @Path("map")
-    public Uni<Response> updateMap(Person person, @Context SecurityContext ctx) {
+    public Uni<Response> updateMap(Person person) {
         if (person.getId() == null) {
             return Uni.createFrom().item(status(BAD_REQUEST))
                     .map(ResponseBuilder::build);

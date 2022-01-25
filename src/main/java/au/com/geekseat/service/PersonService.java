@@ -88,4 +88,9 @@ public class PersonService implements PanacheRepository<Person> {
         person.updatedBy(principal);
         return Panache.withTransaction(() -> update("map = ?1 where id = ?2", person.getMap(), person.getId()));
     }
+
+    public Uni<Person> save(Person person, Principal principal) {
+        person.createdBy(principal);
+        return persist(person);
+    }
 }
